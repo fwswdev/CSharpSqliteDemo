@@ -25,31 +25,33 @@ namespace SqliteConsoleapp
             using (var m_dbConnection =
                 new SQLiteConnection(String.Format("Data Source={0};Version=3;", dbFile)))
             {
+
                 m_dbConnection.Open();
                 m_dbConnection.ChangePassword("Mypass");
-                
+
+                Action<string> funcSqlStr = delegate(string x)
+                {
+                    string sqlStr = x;
+                    var commandDel = new SQLiteCommand(sqlStr, m_dbConnection);
+                    commandDel.ExecuteNonQuery();
+                    commandDel.Dispose();
+                };
+
+
                 string sql = "create table highscores (name varchar(20), score int)";
-                var command = new SQLiteCommand(sql, m_dbConnection);
-                command.ExecuteNonQuery();
-                command.Dispose();
+                funcSqlStr(sql);
 
                 sql = "insert into highscores (name, score) values ('Me', 3000)";
-                command = new SQLiteCommand(sql, m_dbConnection);
-                command.ExecuteNonQuery();
-                command.Dispose();
+                funcSqlStr(sql);
 
                 sql = "insert into highscores (name, score) values ('Myself', 6000)";
-                command = new SQLiteCommand(sql, m_dbConnection);
-                command.ExecuteNonQuery();
-                command.Dispose();
+                funcSqlStr(sql);
 
                 sql = "insert into highscores (name, score) values ('And I', 9001)";
-                command = new SQLiteCommand(sql, m_dbConnection);
-                command.ExecuteNonQuery();
-                command.Dispose();
+                funcSqlStr(sql);
 
                 sql = "select * from highscores order by score desc";
-                command = new SQLiteCommand(sql, m_dbConnection);
+                var command = new SQLiteCommand(sql, m_dbConnection);
 
                 var reader = command.ExecuteReader();
                 while (reader.Read())
